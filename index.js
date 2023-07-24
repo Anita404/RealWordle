@@ -80,6 +80,7 @@ async function init() {
         if (currentGuess == word) {
             alert("YOU WIN!");
             done = true;
+            document.querySelector('.brand').classList.add("winner");
             return;
         }
 

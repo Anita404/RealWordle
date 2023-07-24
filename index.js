@@ -6,16 +6,16 @@ async function init() {
     let currentGuess = ''
     let currentRow = 0;
 
-    fetchWordOfTheDay();
+    const word = await fetchWordOfTheDay();
 
     function addLetter(letter) {
         if (currentGuess.length < ANSWER_LENGTH) {
             currentGuess += letter;
         } else {
             /// replace the last letter
-            currentGuess = currentGuess.substring(0, currentGuess.length - 1) + letter
+            currentGuess = currentGuess.substring(0, currentGuess.length - 1) + letter;
         }
-        letters[currentGuess.length - 1].innerText = letter
+        letters[currentGuess.length - 1].innerText = letter;
     }
 
     async function commit() {
@@ -24,6 +24,20 @@ async function init() {
             return;
         }
 
+        const wordParts = word.split("");
+        const guessParts = currentGuess.split("");
+
+        for (let i = 0; i < ANSWER_LENGTH; i++) {
+            if (guessParts[i] == wordParts[i]) {
+                letters[i].classList.add('correct');
+            }
+            else if (wordParts.includes(guessParts[i])) {
+                letters[i].classList.add('close');
+            }
+            else {
+                letters[i].classList.add('wrong');
+            }
+        }
         // TODO: validate the word
 
         //TODO: do all the marking as "correct", "close" or "wrong"
@@ -47,7 +61,7 @@ async function init() {
         } else if (action == 'Backspace') {
             backspace()
         } else if (isLetter(action)) {
-            addLetter(action);
+            addLetter(action.toUpperCase());
         }
     })
 
@@ -60,9 +74,13 @@ function isLetter(letter) {
 
 async function fetchWordOfTheDay() {
     const response = await fetch("https://words.dev-apis.com/word-of-the-day");
-    const { word } = await response.json();
+    const data = await response.json();
 
+
+    const word = data.word.toUpperCase();
     setLoading(false);
+
+    return word;
 }
 
 function setLoading(isLoading) {

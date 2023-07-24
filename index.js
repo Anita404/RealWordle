@@ -1,6 +1,10 @@
 const letters = document.querySelectorAll(".scoreboard-letter");
 const loadingDiv = document.querySelector(".info-bar");
 const ANSWER_LENGTH = 5;
+const ROUNDS = 6;
+
+let done = false;
+let isLoading = true;
 
 async function init() {
     let currentGuess = '';
@@ -46,6 +50,20 @@ async function init() {
         // TODO: did they win or lose?
 
         currentRow++;
+
+
+        if (currentGuess == word) {
+            alert("YOU WIN!");
+            done = true;
+            return;
+        }
+
+        if (currentRow == ROUNDS) {
+            alert(`YOU LOST, the word was ${word}`);
+            done = true;
+            return;
+        }
+
         currentGuess = "";
     }
 
@@ -55,6 +73,10 @@ async function init() {
     }
 
     document.addEventListener("keydown", (event) => {
+        if (done || isLoading) {
+            //do nothing
+            return;
+        }
         const action = event.key;
 
         if (action == 'Enter') {
@@ -80,6 +102,7 @@ async function fetchWordOfTheDay() {
 
     const word = data.word.toUpperCase();
     setLoading(false);
+    isLoading = false;
 
     return word;
 }

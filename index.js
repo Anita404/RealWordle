@@ -1,10 +1,12 @@
 const letters = document.querySelectorAll(".scoreboard-letter");
-const loadingDiv = document.querySelectorAll(".info-bar");
+const loadingDiv = document.querySelector(".info-bar");
 const ANSWER_LENGTH = 5;
 
 async function init() {
     let currentGuess = ''
     let currentRow = 0;
+
+    fetchWordOfTheDay();
 
     function addLetter(letter) {
         if (currentGuess.length < ANSWER_LENGTH) {
@@ -54,6 +56,17 @@ async function init() {
 
 function isLetter(letter) {
     return /^[a-zA-Z]$/.test(letter);
+}
+
+async function fetchWordOfTheDay() {
+    const response = await fetch("https://words.dev-apis.com/word-of-the-day");
+    const { word } = await response.json();
+
+    setLoading(false);
+}
+
+function setLoading(isLoading) {
+    loadingDiv.classList.toggle('hidden', !isLoading);
 }
 
 init()

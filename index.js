@@ -12,6 +12,13 @@ async function init() {
 
     const word = await fetchWordOfTheDay();
 
+
+    function markInvalidWord() {
+        for (let i = 0; i < ANSWER_LENGTH; i++) {
+            letters[ANSWER_LENGTH * currentRow + i].classList.add('invalid');
+        }
+    }
+
     function addLetter(letter) {
         if (currentGuess.length < ANSWER_LENGTH) {
             currentGuess += letter;
@@ -23,6 +30,27 @@ async function init() {
         letters[ANSWER_LENGTH * currentRow + currentGuess.length - 1].innerText = letter;
     }
 
+
+    async function validateWord(currentGuess) {
+        isLoading = true;
+        setLoading(true);
+
+        const response = await fetch("https://words.dev-apis.com/validate-word", {
+            method: "POST",
+            body: JSON.stringify({ word: currentGuess }),
+        });
+
+        const { validWord } = await response.json();
+
+        isLoading = false;
+        setLoading(false);
+
+        if (!validWord) {
+            markInvalidWord();
+            return;
+        }
+    }
+
     async function commit() {
         if (currentGuess.length !== ANSWER_LENGTH) {
             // do nothing 
@@ -31,6 +59,8 @@ async function init() {
 
         const wordParts = word.split("");
         const guessParts = currentGuess.split("");
+
+        await validateWord(currentGuess);
 
         for (let i = 0; i < ANSWER_LENGTH; i++) {
             if (guessParts[i] == wordParts[i]) {
@@ -43,11 +73,6 @@ async function init() {
                 letters[currentRow * ANSWER_LENGTH + i].classList.add('wrong');
             }
         }
-        // TODO: validate the word
-
-        //TODO: do all the marking as "correct", "close" or "wrong"
-
-        // TODO: did they win or lose?
 
         currentRow++;
 
@@ -69,7 +94,7 @@ async function init() {
 
     function backspace() {
         currentGuess = currentGuess.substring(0, currentGuess.length - 1);
-        letters[currentGuess.length].innerText = "";
+        letters[ANSWER_LENGTH * currentRow + currentGuess.length].innerText = "";
     }
 
     document.addEventListener("keydown", (event) => {
@@ -110,6 +135,9 @@ async function fetchWordOfTheDay() {
 function setLoading(isLoading) {
     loadingDiv.classList.toggle('hidden', !isLoading);
 }
+
+
+
 
 init()
 

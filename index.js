@@ -3,7 +3,7 @@ const loadingDiv = document.querySelector(".info-bar");
 const ANSWER_LENGTH = 5;
 
 async function init() {
-    let currentGuess = ''
+    let currentGuess = '';
     let currentRow = 0;
 
     const word = await fetchWordOfTheDay();
@@ -15,7 +15,8 @@ async function init() {
             /// replace the last letter
             currentGuess = currentGuess.substring(0, currentGuess.length - 1) + letter;
         }
-        letters[currentGuess.length - 1].innerText = letter;
+
+        letters[ANSWER_LENGTH * currentRow + currentGuess.length - 1].innerText = letter;
     }
 
     async function commit() {
@@ -29,13 +30,13 @@ async function init() {
 
         for (let i = 0; i < ANSWER_LENGTH; i++) {
             if (guessParts[i] == wordParts[i]) {
-                letters[i].classList.add('correct');
+                letters[currentRow * ANSWER_LENGTH + i].classList.add('correct');
             }
             else if (wordParts.includes(guessParts[i])) {
-                letters[i].classList.add('close');
+                letters[currentRow * ANSWER_LENGTH + i].classList.add('close');
             }
             else {
-                letters[i].classList.add('wrong');
+                letters[currentRow * ANSWER_LENGTH + i].classList.add('wrong');
             }
         }
         // TODO: validate the word
@@ -45,7 +46,7 @@ async function init() {
         // TODO: did they win or lose?
 
         currentRow++;
-        currentGuess + "";
+        currentGuess = "";
     }
 
     function backspace() {
